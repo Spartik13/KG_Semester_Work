@@ -26,3 +26,29 @@ public:
 private:
     float start_, end_;
 };
+
+// Экспоненциальный туман. Доля цвета тумана растёт с расстоянием
+// по формуле f = 1 - exp(-density * distance).
+class ExpFog : public FogModel {
+public:
+    ExpFog(const Vec3& color, float density)
+        : FogModel(color), density_(density) {}
+
+    void ApplyUniforms(ShaderProgram& shader) const override;
+
+private:
+    float density_;
+};
+
+// Квадратичный экспоненциальный туман. В показателе степени
+// используется квадрат произведения плотности и расстояния.
+class Exp2Fog : public FogModel {
+public:
+    Exp2Fog(const Vec3& color, float density)
+        : FogModel(color), density_(density) {}
+
+    void ApplyUniforms(ShaderProgram& shader) const override;
+
+private:
+    float density_;
+};

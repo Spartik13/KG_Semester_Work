@@ -1,5 +1,6 @@
 #include "ScenePanel.h"
 #include <iostream>
+#include <wx/wfstream.h>
 
 namespace {
 // Параметры окна рисования: цвет RGBA, двойная буферизация, буфер глубины 24 бита.
@@ -90,6 +91,44 @@ void ScenePanel::SetFog(std::unique_ptr<FogModel> fog) {
 void ScenePanel::SetFogEnabled(bool enabled) {
     scene_.SetFogEnabled(enabled);
     Refresh(false);
+}
+
+bool ScenePanel::SaveScreenshot(const wxString& path) {
+    if (!IsShownOnScreen() || !InitGL() || !SetCurrent(*context_)) {
+        return false;
+    }
+
+    const wxSize size = GetClientSize() * GetContentScaleFactor();
+    if (size.x <= 0 || size.y <= 0) {
+        return false;
+    }
+
+    wxImage image(size.x, size.y, false);
+    if (!image.IsOk()) {
+        return false;
+    }
+
+    // Рисуем кадр и читаем пиксели до смены буферов.
+    scene_.Render(size.x, size.y);
+    glReadBuffer(GL_BACK);
+    GLint previousAlignment = 0;
+    glGetIntegerv(GL_PACK_ALIGNMENT, &previousAlignment);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, size.x, size.y, GL_RGB, GL_UNSIGNED_BYTE, image.GetData());
+    glPixelStorei(GL_PACK_ALIGNMENT, previousAlignment);
+
+    if (glGetError() != GL_NO_ERROR) {
+        return false;
+    }
+    SwapBuffers();
+
+    // OpenGL читает строки снизу вверх, поэтому переворачиваем кадр.
+    wxLogNull silence;
+    wxTempFileOutputStream output(path);
+    return output.IsOk()
+        && image.Mirror(false).SaveFile(output, wxBITMAP_TYPE_PNG)
+        && output.IsOk()
+        && output.Commit();
 }
 
 void ScenePanel::OnPaint(wxPaintEvent&) {

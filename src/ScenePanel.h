@@ -13,6 +13,7 @@ public:
     ~ScenePanel() override;
     void SetFog(std::unique_ptr<FogModel> fog);   // выбрать модель тумана
     void SetFogEnabled(bool enabled);             // включить / выключить туман
+    bool SaveScreenshot(const wxString& path);
 
 private:
     void OnPaint(wxPaintEvent& event);

@@ -13,6 +13,7 @@ private:
     void OnParamChanged(wxCommandEvent& event);
     void OnColourChanged(wxColourPickerEvent& event);
     void OnSave(wxCommandEvent& event);
+    void OnLoad(wxCommandEvent& event);
     void OnScreenshot(wxCommandEvent& event);
 
     void ApplyFogFromControls();   // реакция на изменение любого элемента панели
@@ -21,6 +22,9 @@ private:
 
     float FogStart() const { return static_cast<float>(startSlider_->GetValue()); }
     float FogEnd() const { return static_cast<float>(endSlider_->GetValue()); }
+    float FogDensity() const {
+        return densitySlider_->GetValue() / 1000.0f;
+    }
 
     ScenePanel* scenePanel_ = nullptr;
     wxChoice* modelChoice_ = nullptr;
@@ -30,4 +34,6 @@ private:
     wxCheckBox* fogCheck_ = nullptr;
     wxStaticText* startLabel_ = nullptr;
     wxStaticText* endLabel_ = nullptr;
+    wxSlider* densitySlider_ = nullptr;
+    wxStaticText* densityLabel_ = nullptr;
 };
