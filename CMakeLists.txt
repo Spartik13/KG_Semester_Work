@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
         src/Camera.cpp
         src/SceneObject.cpp
         src/FogModel.cpp
+        src/SceneShaders.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${wxWidgets_INCLUDE_DIRS})
